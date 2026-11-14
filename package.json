@@ -1,6 +1,6 @@
 {
   "name": "iptvkz",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "IPTVKZ — player IPTV pessoal para computador e TV (M3U e Xtream Codes)",
   "scripts": {
