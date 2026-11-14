@@ -258,15 +258,26 @@ export function liveView(params, ctx) {
     ctx.setTitle('TV ao Vivo');
   }
 
-  function scrollToPlaying() {
+  // center: ao abrir o canal ou a gaveta, centraliza o que está tocando. Ao trocar de canal, a lista
+  // fica onde está e só rola o mínimo se o canal estiver fora da área visível (zapping com ↑/↓ na TV).
+  // Rola só a lista: scrollIntoView também moveria a página.
+  function scrollToPlaying(center = true) {
     if (!watchEls) return;
     const idx = list.findIndex((c) => c.id === playingId);
     if (idx < 0) return;
-    sideInc && sideInc.ensure(idx + 10);
+    // só o próprio canal: pedir os de baixo fazia a lista pular ao clicar perto do fim do trecho carregado
+    sideInc && sideInc.ensure(idx + 1);
     // espera o próximo quadro: na primeira renderização a view ainda não está no documento.
     setTimeout(() => {
-      const el = watchEls && watchEls.sideScroll.querySelector(`[data-id="${CSS.escape(playingId)}"]`);
-      if (el) el.scrollIntoView({ block: 'center' });
+      const box = watchEls && watchEls.sideScroll;
+      const el = box && box.querySelector(`[data-id="${CSS.escape(playingId)}"]`);
+      if (!el) return;
+      const b = box.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      const top = r.top - b.top + box.scrollTop;
+      if (center) box.scrollTop = top - (box.clientHeight - r.height) / 2;
+      else if (r.top < b.top) box.scrollTop = top;
+      else if (r.bottom > b.bottom) box.scrollTop = top - box.clientHeight + r.height;
     }, 20);
   }
 
@@ -320,7 +331,7 @@ export function liveView(params, ctx) {
       showInfo();
     }
     history.replaceState(null, '', `#/live?cat=${encodeURIComponent(cat)}&ch=${encodeURIComponent(id)}`);
-    scrollToPlaying();
+    scrollToPlaying(false);
     fetchEpg([ch]).then(paintWatchEpg);
     paintWatchEpg();
   }
