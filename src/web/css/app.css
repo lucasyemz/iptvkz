@@ -349,7 +349,7 @@ input, select, textarea { font: inherit; color: inherit; }
 /* ---------- visualização Streaming: destaque + fileiras de cards deitados ---------- */
 .vod-browse.stream { grid-template-columns: minmax(0, 1fr); }
 .vod-browse.stream > .cats { display: none; }
-.hero-stream { --hero-h: calc(var(--app-h, 100vh) * .52); position: relative; height: var(--hero-h); min-height: 300px; max-height: 560px; overflow: hidden; background: var(--bg); }
+.hero-stream { --hero-h: calc(var(--app-h, 100vh) * .52); position: relative; height: var(--hero-h); min-height: 350px; max-height: 560px; overflow: hidden; background: var(--bg); }
 .hero-art { position: absolute; top: 0; right: 0; width: 68%; height: 100%; object-fit: cover; object-position: center 20%; opacity: 0; transition: opacity .45s ease; }
 .hero-art.on { opacity: 1; }
 .hero-stream.wide-art .hero-art { width: 100%; object-position: center 30%; }
@@ -367,6 +367,15 @@ input, select, textarea { font: inherit; color: inherit; }
 .hero-info { position: relative; z-index: 1; height: 100%; padding: 32px 24px 28px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; }
 /* o texto fica estreito (legível sobre a imagem); os botões usam a largura toda */
 .hero-title, .hero-meta, .hero-versions { max-width: 560px; max-width: max(48%, 520px); } /* 560px: TVs sem max() */
+/* min-height 350px (acima): cabe título de duas linhas, informações, versões, duas linhas de sinopse e botões.
+   Sem espaço no destaque, só a sinopse encolhe: título, informações, versões e botões mantêm o tamanho
+   (o título tem overflow: hidden, então sem isto era o primeiro a ser espremido e aparecia cortado). */
+.hero-info > * { flex-shrink: 0; }
+.hero-info > .hero-plot { flex-shrink: 1; min-height: 0; }
+/* versões numa linha: rola de lado (toque, trackpad, setas do controle) em vez de ocupar duas linhas */
+.hero-info > .hero-versions { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.hero-info > .hero-versions::-webkit-scrollbar { display: none; }
+.hero-info > .hero-versions > * { flex-shrink: 0; }
 .hero-title { margin: 0; font: 700 40px/1.1 var(--font-display); letter-spacing: -0.5px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 14px; font-weight: 600; }
 .hero-plot { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 560px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
@@ -396,10 +405,10 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 /* PC e TV: o destaque fica preso no topo e as fileiras passam por baixo, como nos apps de streaming; assim ele
    mostra o título em foco ou sob o mouse em qualquer ponto da página. O scroll-padding faz o foco parar abaixo dele. */
-.stream-home .hero-stream { --hero-h: calc(var(--app-h, 100vh) * .46); min-height: 260px; position: -webkit-sticky; position: sticky; top: 0; z-index: 3; }
+.stream-home .hero-stream { --hero-h: calc(var(--app-h, 100vh) * .46); min-height: 350px; position: -webkit-sticky; position: sticky; top: 0; z-index: 3; }
 .tv .stream-home .hero-stream { min-height: 0; }
 /* o card em foco para a ~58px do destaque: cabe o título da fileira dele, e a fileira de cima some atrás do destaque */
-.stream-scroll { scroll-padding-top: calc(var(--app-h, 100vh) * .46 + 58px); }
+.stream-scroll { scroll-padding-top: calc(var(--app-h, 100vh) * .46 + 58px); scroll-padding-top: calc(max(var(--app-h, 100vh) * .46, 350px) + 58px); } /* a 2ª acompanha o min-height do destaque; TVs sem max() usam a 1ª */
 /* celular: destaque ocupa a largura, texto por cima da imagem, cards menores */
 @media (max-width: 760px) {
   /* no celular não há mouse nem foco para mudar o destaque, e preso ele tomaria metade da tela: rola junto */
